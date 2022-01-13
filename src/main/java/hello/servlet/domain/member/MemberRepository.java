@@ -35,7 +35,11 @@ public class MemberRepository {
     }
 
     public List<Member> findAll() {
-        return new ArrayList<>(store.values());
+        return new ArrayList<>(store.values());//store 자체를 보호하기 위해 ArrayList에 담아줌
+    }
+
+    public void clearStore() {
+        store.clear(); //store 값을 다 날림 (테스트에서만 사용)
     }
 
 }
