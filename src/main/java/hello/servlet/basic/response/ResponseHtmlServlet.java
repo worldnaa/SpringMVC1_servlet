@@ -12,9 +12,11 @@ import java.io.PrintWriter;
 public class ResponseHtmlServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         //Content-Type: text/html;charset=utf-8
-        response.setContentType("text/html");
-        response.setCharacterEncoding("utf-8"); //안 하면 한글 깨짐
+
+        response.setContentType("text/html");   // HTML 반환 시 text/html로 지정해야 한다
+        response.setCharacterEncoding("utf-8"); // 안 하면 한글 깨짐
 
         PrintWriter writer = response.getWriter();
         writer.println("<html>");

@@ -17,8 +17,10 @@ public class ResponseJsonServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         //Content-Type: application/json
-        response.setContentType("application/json");
+
+        response.setContentType("application/json"); // JSON 반환 시 application/json로 지정해야 한다
         response.setCharacterEncoding("utf-8");
 
         HelloData helloData = new HelloData();
@@ -26,7 +28,7 @@ public class ResponseJsonServlet extends HttpServlet {
         helloData.setAge(20);
 
         //{"username":"kim", "age":20}
-        String result = objectMapper.writeValueAsString(helloData);//객체를 값으로 써서 문자로 바꾼다
+        String result = objectMapper.writeValueAsString(helloData); // 객체를 JSON 문자로 변경할 수 있다
         response.getWriter().write(result);
     }
 }

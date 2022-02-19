@@ -9,16 +9,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * http://localhost:8080/response-header
+ */
 @WebServlet(name = "responseHeaderServlet", urlPatterns = "/response-header")
 public class ResponseHeaderServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         //[status-line]
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.setStatus(HttpServletResponse.SC_OK); // 200
 
         //[response-header]
-//      response.setHeader("Content-Type", "text/plain;charset=utf-8");
+        response.setHeader("Content-Type", "text/plain;charset=utf-8");
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
         response.setHeader("my-header", "hello");
@@ -29,11 +33,15 @@ public class ResponseHeaderServlet extends HttpServlet {
         redirect(response);
 
         //[message body]
-        PrintWriter writer = response.getWriter();
-        writer.println("안녕하세요");
+//      PrintWriter writer = response.getWriter();
+//      writer.println("안녕하세요");
+        response.getWriter().println("안녕하세요");
     }
 
     private void content(HttpServletResponse response) {
+        // Content-Type: text/plain;charset=utf-8
+        // Content-Length: 2
+        
 //      response.setHeader("Content-Type", "text/plain;charset=utf-8"); //기존방식
         response.setContentType("text/plain");
         response.setCharacterEncoding("utf-8");
@@ -41,20 +49,20 @@ public class ResponseHeaderServlet extends HttpServlet {
     }
 
     private void cookie(HttpServletResponse response) {
-        //Set-Cookie: myCookie=good; Max-Age=600;
-        //response.setHeader("Set-Cookie", "myCookie=good; Max-Age=600"); //기존방식
+        // Set-Cookie: myCookie=good; Max-Age=600;
+
+//      response.setHeader("Set-Cookie", "myCookie=good; Max-Age=600"); //기존방식
         Cookie cookie = new Cookie("myCookie", "good");
         cookie.setMaxAge(600); //600초
         response.addCookie(cookie);
     }
 
     private void redirect(HttpServletResponse response) throws IOException {
-        //Status Code 302
-        //Location: /basic/hello-form.html
+        // Status Code 302
+        // Location: /basic/hello-form.html
 
-//        response.setStatus(HttpServletResponse.SC_FOUND); //302   //기존방식
-//        response.setHeader("Location", "/basic/hello-form.html"); //기존방식
+//      response.setStatus(HttpServletResponse.SC_FOUND); //302   //기존방식
+//      response.setHeader("Location", "/basic/hello-form.html"); //기존방식
         response.sendRedirect("/basic/hello-form.html");
     }
-
 }
