@@ -28,47 +28,65 @@ public class FrontControllerServletV3 extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        // URL에서 8080 뒤 '/'부터 가져온다 (ex. /front-controller/v3/members)
         String requestURI = request.getRequestURI();
 
+        // 각 컨트롤러의 인스턴스 리턴 (ex. new MemberListControllerV3())
         ControllerV3 controller = controllerMap.get(requestURI);
-        if (controller == null) { // 예외처리
+
+        // 예외처리
+        if (controller == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         
         /* FrontControllerServletV2 의 코드
         MyView view = controller.process(request, response);
-        view.render(request, response); */
-        
-        Map<String, String> paramMap = createParamMap(request); // Ctrl + Alt + M : 메서드추출
+        view.render(request, response);
+        */
 
-        ModelView mv = controller.process(paramMap); // ControllerV3.process 는 ModelView 를 리턴
-        System.out.println("mv = " + mv); //ex) mv = ModelView{viewName='save-result', model={member=hello.servlet.domain.member.Member@78924dad}}
+        // 1. 컨트롤러에 전달할 파라미터 정보(ex.age=20)를 Map에 담는다
+        // 컨트롤러 인터페이스 : ModelView process( Map<String, String> paramMap );
+        Map<String, String> paramMap = createParamMap(request);
 
-        String viewName = mv.getViewName(); //논리이름이 담겨있다 (ex. new-form)
+        // 2. Map에 담긴 파라미터 정보를 인자로 넘기며, process() 실행
+        // 3. 컨트롤러 process() 실행 시, ModelView("논리이름") 가 리턴 됨
+        // 4. 리턴된 ModelView("논리이름") 를 변수 'mv'에 담는다
+        ModelView mv = controller.process(paramMap);
+        System.out.println("mv = " + mv);
 
-        MyView view = viewResolver(viewName); // Ctrl + Alt + M : 메서드추출
-        System.out.println("view = " + view); // ex) view = MyView{viewPath='/WEB-INF/views/save-result.jsp'}
+        // 5. ModelView 객체에서 viewName(논리이름) 을 꺼내와 변수 'viewName'에 담는다
+        String viewName = mv.getViewName();
 
+        // 6. 논리이름을 물리경로로 만들어, MyView 객체를 반환
+        MyView view = viewResolver(viewName);
+        System.out.println("view = " + view);
+
+        // 7.
         view.render(mv.getModel(), request, response);
     }
 
+    // 컨트롤러가 반환한 논리뷰 이름(viewName)을 실제 물리뷰 경로로 변경한다.
+    // 그리고 실제 물리경로가 있는 MyView 객체를 반환한다.
     private MyView viewResolver(String viewName) {
         return new MyView("/WEB-INF/views/" + viewName + ".jsp");
     }
 
+    // HttpServletRequest 에서 파라미터 정보를 꺼내서 Map으로 변환한다.
+    // 그리고 해당 Map(paramMap)을 컨트롤러에 전달하면서 호출한다.
     private Map<String, String> createParamMap(HttpServletRequest request) {
+
         Map<String, String> paramMap = new HashMap<>();
         
-        // getParameterNames() => 파라미터의 모든 이름 꺼내기
-        // .asIterator().forEachRemaining() => 반복문과 비슷
+        // 1. getParameterNames() 에서 모든 파라미터 이름을 꺼내 paramName 에 반복해 담는다
+        // 2. key를 paramName , value를 request.getParameter(paramName) 으로 해서 paramMap 에 담는다
         request.getParameterNames().asIterator()
-                .forEachRemaining(paramName -> paramMap.put(paramName, request.getParameter(paramName)));
-                // 1. getParameterNames() 에서 꺼낸 이름을 paramName 에 담는다
-                // 2. key를 paramName , value를 request.getParameter(paramName) 으로 해서 paramMap 에 담는다
+                .forEachRemaining( paramName -> paramMap.put( paramName, request.getParameter(paramName) ) );
 
-        System.out.println("paramMap = " + paramMap); //ex. paramMap = {age=20, username=kim}
+        System.out.println("paramMap = " + paramMap); //결과 ex) paramMap = {age=20, username=kim}
         
         return paramMap;
     }
 }
+// Ctrl + Alt + M : 메서드추출

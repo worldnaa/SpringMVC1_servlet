@@ -26,14 +26,20 @@ public class FrontControllerServletV1 extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String requestURI = request.getRequestURI(); //URL에서 8080 뒤 '/'부터 가져온다 (ex. /front-controller/v1/members)
 
-        ControllerV1 controller = controllerMap.get(requestURI); //각 컨트롤러의 인스턴스 리턴 (ex. new MemberListControllerV1())
-        if (controller == null) { // 예외처리
+        // URL에서 8080 뒤 '/'부터 가져온다 (ex. /front-controller/v1/members)
+        String requestURI = request.getRequestURI();
+
+        // 각 컨트롤러의 인스턴스 리턴 (ex. new MemberListControllerV1())
+        ControllerV1 controller = controllerMap.get(requestURI);
+
+        // 예외처리
+        if (controller == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        controller.process(request, response); //Ctrl + Alt + B : 구현체 확인 및 이동
+        // Ctrl + Alt + B : 구현체 확인 및 이동
+        controller.process(request, response);
     }
 }

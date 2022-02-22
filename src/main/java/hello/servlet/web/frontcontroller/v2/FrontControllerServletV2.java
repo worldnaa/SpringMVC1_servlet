@@ -28,16 +28,23 @@ public class FrontControllerServletV2 extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        // URL에서 8080 뒤 '/'부터 가져온다 (ex. /front-controller/v2/members)
         String requestURI = request.getRequestURI();
 
+        // 각 컨트롤러의 인스턴스 리턴 (ex. new MemberListControllerV2())
         ControllerV2 controller = controllerMap.get(requestURI);
+
+        // 예외처리
         if (controller == null) { // 예외처리
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        // V1의 controller.process(request, response) ==> 각각의 컨트롤러 안에 jsp로 이동하는 코드(RequestDispatcher)가 있다
-        MyView view = controller.process(request, response); //controller.process() 는 MyView("물리주소")를 리턴한다
+        // Ctrl + Alt + B : 구현체 확인 및 이동
+        // ControllerV1 : void 리턴 -> 각각의 컨트롤러 안에서 dispatcher.forward 를 한다
+        // ControllerV2 : MyView("물리주소")를 리턴 -> render() 안에서 dispatcher.forward 를 한다
+        MyView view = controller.process(request, response);
         view.render(request, response);
     }
 }

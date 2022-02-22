@@ -17,6 +17,6 @@ public class MemberFormControllerV3 implements ControllerV3 {
     
     /* MemberFormControllerV2 의 코드 
     public MyView process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        return new MyView("/WEB-INF/views/new-form.jsp"); // Ctrl+Alt+N 해서 한줄로 합치기
+        return new MyView("/WEB-INF/views/new-form.jsp");
     }*/
 }
