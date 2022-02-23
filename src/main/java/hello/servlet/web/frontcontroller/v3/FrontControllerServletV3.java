@@ -41,29 +41,22 @@ public class FrontControllerServletV3 extends HttpServlet {
             return;
         }
         
-        /* FrontControllerServletV2 의 코드
-        MyView view = controller.process(request, response);
-        view.render(request, response);
-        */
-
         // 1. 컨트롤러에 전달할 파라미터 정보(ex.age=20)를 Map에 담는다
         // 컨트롤러 인터페이스 : ModelView process( Map<String, String> paramMap );
         Map<String, String> paramMap = createParamMap(request);
 
         // 2. Map에 담긴 파라미터 정보를 인자로 넘기며, process() 실행
-        // 3. 컨트롤러 process() 실행 시, ModelView("논리이름") 가 리턴 됨
-        // 4. 리턴된 ModelView("논리이름") 를 변수 'mv'에 담는다
+        // 2. 컨트롤러 process() 실행 시, ModelView("논리이름") 가 리턴 됨
         ModelView mv = controller.process(paramMap);
-        System.out.println("mv = " + mv);
 
-        // 5. ModelView 객체에서 viewName(논리이름) 을 꺼내와 변수 'viewName'에 담는다
+        // 3. ModelView 객체에서 viewName(논리이름) 을 꺼내와 변수 'viewName'에 담는다
         String viewName = mv.getViewName();
 
-        // 6. 논리이름을 물리경로로 만들어, MyView 객체를 반환
+        // 4. 논리이름을 물리경로로 만들어, MyView 객체를 반환
         MyView view = viewResolver(viewName);
         System.out.println("view = " + view);
 
-        // 7.
+        // 5. MyView 의 render() 실행 => dispatcher.forward 실행
         view.render(mv.getModel(), request, response);
     }
 

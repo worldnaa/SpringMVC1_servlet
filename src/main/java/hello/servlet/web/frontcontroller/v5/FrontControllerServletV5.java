@@ -22,17 +22,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// 컨트롤러(Controller) ==> 핸들러(Handler)
+// 이전에는 컨트롤러를 직접 매핑해서 사용. 이제는 어댑터를 사용하기에, 어댑터가 지원하기만 하면, 어떤 것이라도 매핑해서 사용가능.
+// 그래서 이름을 컨트롤러에서 더 넒은 범위의 핸들러로 변경.
 @WebServlet(name = "frontControllerServletV5", urlPatterns = "/front-controller/v5/*")
 public class FrontControllerServletV5 extends HttpServlet {
 
+    // 매핑 정보의 값이 ControllerV3, ControllerV4 같은 인터페이스에서 아무값이나 받을 수 있는 Object로 변경 됨
     private final Map<String, Object> handlerMappingMap = new HashMap<>();
     private final List<MyHandlerAdapter> handlerAdapters = new ArrayList<>();
 
+    // 생성자는 핸들러 매핑과 어댑터를 초기화(등록) 한다
     public FrontControllerServletV5() {
         initHandlerMappingMap();
         initHandlerAdapters();
     }
 
+    // 생성과 동시에 실행 (핸들러 매핑)
     private void initHandlerMappingMap() {
         handlerMappingMap.put("/front-controller/v5/v3/members/new-form", new MemberFormControllerV3());
         handlerMappingMap.put("/front-controller/v5/v3/members/save", new MemberSaveControllerV3());
@@ -43,6 +49,7 @@ public class FrontControllerServletV5 extends HttpServlet {
         handlerMappingMap.put("/front-controller/v5/v4/members", new MemberListControllerV4());
     }
 
+    // 생성과 동시에 실행 (어댑터 초기화)
     private void initHandlerAdapters() {
         handlerAdapters.add(new ControllerV3HandlerAdapter());
         handlerAdapters.add(new ControllerV4HandlerAdapter());
@@ -68,18 +75,24 @@ public class FrontControllerServletV5 extends HttpServlet {
         view.render(mv.getModel(), request, response);
     }
 
+    // 핸들러 매핑 메서드
+    // 핸들러 매핑 정보인 handlerMappingMap 에서 URL에 매핑된 핸들러(컨트롤러) 객체를 찾아서 반환
+    private Object getHandler(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        return handlerMappingMap.get(requestURI);
+    }
+
+    // 핸들러를 처리할 수 있는 어댑터 조회 메서드
+    // handler 를 처리할 수 있는 어댑터를 adapter.supports(handler) 를 통해서 찾는다
+    // 만약 handler가 ControllerV3 인터페이스를 구현했다면, ControllerV3HandlerAdapter 객체가 반환
     private MyHandlerAdapter getHandleradapter(Object handler) {
+
         for (MyHandlerAdapter adapter : handlerAdapters) {
             if (adapter.supports(handler)) {
                 return adapter;
             }
         }
         throw new IllegalArgumentException("handler adapter를 찾을 수 없습니다. handler=" + handler);
-    }
-
-    private Object getHandler(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        return handlerMappingMap.get(requestURI);
     }
 
     private MyView viewResolver(String viewName) {
