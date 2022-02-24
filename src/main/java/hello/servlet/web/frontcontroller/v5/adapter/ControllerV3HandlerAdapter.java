@@ -14,7 +14,7 @@ import java.util.Map;
 // 인터페이스 MyHandlerAdapter 를 구현한 실제 어댑터 (ControllerV3를 지원하는 어댑터 구현)
 public class ControllerV3HandlerAdapter implements MyHandlerAdapter {
 
-    @Override
+    @Override // handler ex) MemberFormControllerV3()
     public boolean supports(Object handler) {
         // handler(=컨트롤러) 가 ControllerV3 의 인스턴스면 true 리턴
         // ControllerV3을 처리할 수 있는 어댑터인지 확인

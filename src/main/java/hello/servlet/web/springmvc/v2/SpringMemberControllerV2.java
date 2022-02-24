@@ -9,7 +9,10 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-
+/**
+ * 클래스 단위 -> 메서드 단위
+ * @RequestMapping 클래스 레벨과 메서드 레벨 조합
+ */
 @Controller
 @RequestMapping("/springmvc/v2/members")
 public class SpringMemberControllerV2 {
@@ -30,18 +33,18 @@ public class SpringMemberControllerV2 {
         memberRepository.save(member);
 
         ModelAndView mv = new ModelAndView("save-result");
-        mv.addObject("member", member); //ModelAndView에서 addObject 기능 지원
+        mv.addObject("member", member);
 
         return mv;
     }
 
     @RequestMapping
     public ModelAndView members() {
-
         List<Member> members = memberRepository.findAll();
 
         ModelAndView mv = new ModelAndView("members");
         mv.addObject("members", members);
+
         return mv;
     }
 }

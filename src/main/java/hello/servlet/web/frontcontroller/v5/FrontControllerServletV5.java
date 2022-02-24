@@ -58,21 +58,32 @@ public class FrontControllerServletV5 extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        Object handler = getHandler(request); //핸들러 찾아와
+        // 1. 핸들러 조회 : request URI 를 통해 해당하는 핸들러(컨트롤러)를 찾아온다
+        // 결과 ex) new MemberFormControllerV3()
+        Object handler = getHandler(request);
 
-        if (handler == null) { // 예외처리
+        // 예외처리
+        if (handler == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        MyHandlerAdapter adapter = getHandleradapter(handler); //핸들러 어댑터 찾아와
+        // 2. 핸들러 어댑터 조회 : 핸들러(컨트롤러)를 통해 해당하는 어댑터를 찾아온다
+        // MyHandlerAdapter 는 각각 핸들러어댑터들의 인터페이스
+        // 어떤 핸들러어댑터가 와도 사용할 수 있도록 인터페이스를 타입으로 지정 (다형성)
+        // 결과 ex) new ControllerV3HandlerAdapter()
+        MyHandlerAdapter adapter = getHandleradapter(handler);
 
+        // 3. 핸들러 어댑터 실행 : 찾아온 실제 어댑터를 호출한다
+        // 4. 핸들러 실행 : 호출된 어댑터가 핸들러(컨트롤러)를 실행한다
+        // 예를들어 handler 로 new MemberSaveControllerV3() 를 보냈을 경우
+        // MemberSaveControllerV3 의 Model(응답데이터)과 ViewName(응답경로)을 가진 ModelView 객체 반환
         ModelView mv = adapter.handle(request, response, handler);
 
-        String viewName = mv.getViewName();
-        MyView view = viewResolver(viewName);
+        String viewName = mv.getViewName();   // ModelView 에서 논리이름 가져와 저장
+        MyView view = viewResolver(viewName); // 논리이름으로 MyView 객체의 인스턴스 생성
 
-        view.render(mv.getModel(), request, response);
+        view.render(mv.getModel(), request, response); // MyView 객체의 render()를 실행 => 뷰 렌더링
     }
 
     // 핸들러 매핑 메서드
@@ -82,19 +93,23 @@ public class FrontControllerServletV5 extends HttpServlet {
         return handlerMappingMap.get(requestURI);
     }
 
-    // 핸들러를 처리할 수 있는 어댑터 조회 메서드
-    // handler 를 처리할 수 있는 어댑터를 adapter.supports(handler) 를 통해서 찾는다
-    // 만약 handler가 ControllerV3 인터페이스를 구현했다면, ControllerV3HandlerAdapter 객체가 반환
+    // 핸들러(컨트롤러)를 처리할 수 있는 실제 어댑터 생성 메서드
     private MyHandlerAdapter getHandleradapter(Object handler) {
 
+        // handlerAdapters 리스트에서 반복문을 통해 값을 꺼내온다
+        // 리스트에 담긴 값 : ControllerV3HandlerAdapter, ControllerV4HandlerAdapter
         for (MyHandlerAdapter adapter : handlerAdapters) {
+
+            // ControllerV3HandlerAdapter.supports(), ControllerV4HandlerAdapter.supports() 실행
+            // supports()를 실행해서 true가 넘어왔을 경우 아래 if문 실행
             if (adapter.supports(handler)) {
-                return adapter;
+                return adapter; // 결과 ex) new ControllerV3HandlerAdapter()
             }
         }
         throw new IllegalArgumentException("handler adapter를 찾을 수 없습니다. handler=" + handler);
     }
 
+    // 논리이름을 받아 물리경로로 바꾼 후 MyView 객체를 생성하여 리턴
     private MyView viewResolver(String viewName) {
         return new MyView("/WEB-INF/views/" + viewName + ".jsp");
     }
